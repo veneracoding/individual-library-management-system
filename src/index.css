@@ -143,3 +143,63 @@ button:focus-visible, input:focus-visible, select:focus-visible {
   outline: 2px solid var(--accent);
   outline-offset: 2px;
 }
+
+/* ── Fix select dropdown options dark theme ── */
+select {
+  background: var(--bg3) !important;
+  color: var(--text) !important;
+  border: 1px solid var(--border) !important;
+  border-radius: var(--radius) !important;
+  outline: none !important;
+  font-family: var(--font-body) !important;
+  cursor: pointer;
+  -webkit-appearance: none;
+  appearance: none;
+  padding-right: 28px;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%238892aa' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E") !important;
+  background-repeat: no-repeat !important;
+  background-position: right 8px center !important;
+}
+
+select option {
+  background: var(--bg3) !important;
+  color: var(--text) !important;
+  padding: 8px 12px;
+}
+
+select:focus {
+  border-color: var(--accent) !important;
+  box-shadow: 0 0 0 3px var(--accent-soft) !important;
+}
+
+[data-theme="light"] select {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%234b5675' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E") !important;
+}
+
+[data-theme="light"] select option {
+  background: #ffffff !important;
+  color: #111827 !important;
+}
+
+/* colorScheme for native select dropdown */
+[data-theme="dark"] select {
+  color-scheme: dark;
+}
+[data-theme="light"] select {
+  color-scheme: light;
+}
+
+/* Native select dropdown background fix */
+[data-theme="dark"] select,
+[data-theme="dark"] select option {
+  background-color: #1c2235 !important;
+  color: #eef0f8 !important;
+  color-scheme: dark;
+}
+
+[data-theme="light"] select,
+[data-theme="light"] select option {
+  background-color: #ffffff !important;
+  color: #111827 !important;
+  color-scheme: light;
+}

@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { load, K } from '../utils';
 import { useLang } from '../context/LangContext';
-import { PageHeader, Card, StatCard, Badge, Table, TR, TD, Input, Select } from '../components/UI';
+import { PageHeader, Card, StatCard, Badge, Table, TR, TD, SearchBar } from '../components/UI';
 
 export default function AllBooks() {
   const { t } = useLang();
@@ -94,15 +94,20 @@ export default function AllBooks() {
 
       {/* Full table */}
       <Card>
-        <div style={{ display: 'flex', gap: 10, marginBottom: '1rem', flexWrap: 'wrap' }}>
-          <Input style={{ flex: 1, minWidth: 200 }} placeholder="🔍 Qidirish..." value={search} onChange={e => setSearch(e.target.value)} />
-          <Select style={{ width: 180 }} value={sort} onChange={e => setSort(e.target.value)}>
+        <SearchBar value={search} onChange={e => setSearch(e.target.value)} placeholder="Kitob yoki muallif qidirish..." style={{ marginBottom: '1rem' }}>
+          <select value={sort} onChange={e => setSort(e.target.value)} style={{
+            padding: '9px 28px 9px 10px', background: 'var(--bg3)',
+            border: '1px solid var(--border)', borderRadius: 10,
+            color: 'var(--text)', fontSize: 12, cursor: 'pointer',
+            fontFamily: 'var(--font-body)', outline: 'none',
+          }}>
             <option value="mostRead">Ko'p o'qilgan</option>
             <option value="rating">Reyting</option>
             <option value="available">Mavjud</option>
             <option value="title">Sarlavha</option>
-          </Select>
-        </div>
+          </select>
+          <span style={{ fontSize: 12, color: 'var(--text3)', whiteSpace: 'nowrap' }}>{filtered.length} ta</span>
+        </SearchBar>
 
         <Table headers={['#', 'Kitob', t('author'), t('genre'), 'O\'qilgan', 'Reyting', t('available'), t('total'), 'Holat']}>
           {filtered.map((b, i) => (

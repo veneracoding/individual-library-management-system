@@ -61,8 +61,9 @@ export function Input(props) {
 }
 
 export function Select({ children, ...props }) {
+  const theme = document.documentElement.getAttribute("data-theme") || "dark";
   return (
-    <select style={{ ...inputStyle, cursor: 'pointer' }} {...props}
+    <select style={{ ...inputStyle, cursor: "pointer", colorScheme: theme }} {...props}
       onFocus={e => { e.target.style.borderColor = 'var(--accent)'; e.target.style.boxShadow = '0 0 0 3px var(--accent-soft)'; }}
       onBlur={e => { e.target.style.borderColor = 'var(--border)'; e.target.style.boxShadow = 'none'; }}
     >{children}</select>
@@ -253,6 +254,50 @@ export function Tabs({ tabs, active, onChange }) {
           marginBottom: -1, transition: 'all 0.15s',
         }}>{t.label}</button>
       ))}
+    </div>
+  );
+}
+
+/* ── SearchBar — Catalog style ── */
+export function SearchBar({ value, onChange, placeholder = 'Qidirish...', children, style }) {
+  return (
+    <div style={{
+      background: 'var(--bg2)', border: '1px solid var(--border)',
+      borderRadius: 14, padding: '0.75rem 1rem',
+      display: 'flex', gap: 8, alignItems: 'center', flexWrap: 'wrap',
+      marginBottom: '1rem', transition: 'border-color 0.15s',
+      ...style,
+    }}>
+      {/* Search input with icon */}
+      <div style={{ flex: 1, minWidth: 180, position: 'relative', display: 'flex', alignItems: 'center' }}>
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"
+          style={{ position: 'absolute', left: 11, color: 'var(--text3)', pointerEvents: 'none', flexShrink: 0 }}>
+          <circle cx="11" cy="11" r="8"/>
+          <line x1="21" y1="21" x2="16.65" y2="16.65"/>
+        </svg>
+        <input
+          value={value}
+          onChange={onChange}
+          placeholder={placeholder}
+          style={{
+            width: '100%', padding: '9px 12px 9px 34px',
+            background: 'var(--bg3)', border: '1px solid var(--border)',
+            borderRadius: 10, color: 'var(--text)', fontSize: 13,
+            outline: 'none', fontFamily: 'var(--font-body)',
+            transition: 'border-color 0.2s, box-shadow 0.2s',
+          }}
+          onFocus={e => {
+            e.target.style.borderColor = 'var(--accent)';
+            e.target.style.boxShadow = '0 0 0 3px var(--accent-soft)';
+          }}
+          onBlur={e => {
+            e.target.style.borderColor = 'var(--border)';
+            e.target.style.boxShadow = 'none';
+          }}
+        />
+      </div>
+      {/* Extra controls (select, buttons) passed as children */}
+      {children}
     </div>
   );
 }

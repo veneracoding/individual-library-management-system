@@ -1,9 +1,9 @@
 import React, { useState, useRef } from 'react';
 import { load, save, K, uid } from '../utils';
-import { PageHeader, Card, Badge, Table, TR, TD, Btn, Modal, FormGroup, Input, Select, Textarea, Empty } from '../components/UI';
+import { PageHeader, Card, Badge, Table, TR, TD, Btn, Modal, FormGroup, Input, Select, Textarea, Empty, SearchBar } from '../components/UI';
 import { useAuth } from '../context/AuthContext';
 
-const GENRES = ['Roman', 'Darslik', 'Texnik', "She'riyat", 'Tarix', 'Detektiv', 'Boshqa'];
+const GENRES = ['Roman', 'Darslik', 'Texnik', "She'riyat", 'Tarix', 'Detektiv', 'Bolalar', 'Boshqa'];
 const COLORS = ['#7c3aed','#0891b2','#b45309','#0f766e','#1d4ed8','#7f1d1d','#374151','#0e7490','#065f46','#92400e'];
 const empty = { title: '', author: '', year: '', genre: 'Roman', count: 1, coverColor: '#5b8df6', description: '', pages: '', publisher: '', language: "O'zbek", image: '' };
 
@@ -50,13 +50,20 @@ export default function Books() {
 
   const handleDelete = (id) => {
     if (!window.confirm("Bu kitobni o'chirmoqchimisiz?")) return;
-    save(K.BOOKS, books.filter(b => b.id !== id));
-    setBooks(books.filter(b => b.id !== id));
+    const updated = books.filter(b => b.id !== id);
+    save(K.BOOKS, updated); setBooks(updated);
   };
 
   const openEdit = (b) => {
     setForm({ title: b.title, author: b.author, year: b.year || '', genre: b.genre, count: b.count, coverColor: b.coverColor || '#5b8df6', description: b.description || '', pages: b.pages || '', publisher: b.publisher || '', language: b.language || "O'zbek", image: b.image || '' });
     setModal(b.id);
+  };
+
+  const selectStyle = {
+    padding: '9px 28px 9px 10px', background: 'var(--bg3)',
+    border: '1px solid var(--border)', borderRadius: 10,
+    color: 'var(--text)', fontSize: 12, cursor: 'pointer',
+    fontFamily: 'var(--font-body)', outline: 'none', colorScheme: 'dark light',
   };
 
   return (
@@ -66,15 +73,22 @@ export default function Books() {
         subtitle={`Jami ${books.length} xil, ${books.reduce((s, b) => s + b.count, 0)} nusxa`}
         action={isAdmin && <Btn variant="primary" onClick={() => { setForm(empty); setModal('add'); }}>+ Kitob qo'shish</Btn>}
       />
+
+      <SearchBar
+        value={search}
+        onChange={e => setSearch(e.target.value)}
+        placeholder="Kitob yoki muallif qidirish..."
+      >
+        <select value={genreFilter} onChange={e => setGenreFilter(e.target.value)} style={selectStyle}>
+          <option>Barchasi</option>
+          {GENRES.map(g => <option key={g}>{g}</option>)}
+        </select>
+        <span style={{ fontSize: 12, color: 'var(--text3)', whiteSpace: 'nowrap' }}>
+          {filtered.length} ta
+        </span>
+      </SearchBar>
+
       <Card>
-        <div style={{ display: 'flex', gap: 10, marginBottom: '1rem', flexWrap: 'wrap' }}>
-          <Input style={{ flex: 1, minWidth: 200 }} placeholder="Kitob yoki muallif qidirish..."
-            value={search} onChange={e => setSearch(e.target.value)} />
-          <Select style={{ width: 160 }} value={genreFilter} onChange={e => setGenreFilter(e.target.value)}>
-            <option>Barchasi</option>
-            {GENRES.map(g => <option key={g}>{g}</option>)}
-          </Select>
-        </div>
         {filtered.length ? (
           <Table headers={['#', 'Muqova', 'Kitob nomi', 'Muallif', 'Yil', 'Janr', 'Mavjud', 'Jami', ...(isAdmin ? ['Amallar'] : [])]}>
             {filtered.map((b, i) => (
@@ -83,12 +97,14 @@ export default function Books() {
                 <TD style={{ width: 52 }}>
                   {b.image
                     ? <img src={b.image} alt="" style={{ width: 36, height: 50, objectFit: 'cover', borderRadius: 5 }} />
-                    : <div style={{ width: 36, height: 50, borderRadius: 5, background: b.coverColor || '#5b8df6', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 16 }}>📖</div>
+                    : <div style={{ width: 36, height: 50, borderRadius: 5, background: b.coverColor || '#5b8df6', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="rgba(255,255,255,0.9)" ><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
+                      </div>
                   }
                 </TD>
                 <TD><span style={{ color: 'var(--text)', fontWeight: 600 }}>{b.title}</span></TD>
                 <TD>{b.author}</TD>
-                <TD>{b.year || '—'}</TD>
+                <TD>{b.year || 'вЂ”'}</TD>
                 <TD><Badge>{b.genre}</Badge></TD>
                 <TD><Badge color={b.available === 0 ? 'red' : b.available < 2 ? 'amber' : 'green'}>{b.available}</Badge></TD>
                 <TD>{b.count}</TD>
@@ -103,7 +119,7 @@ export default function Books() {
               </TR>
             ))}
           </Table>
-        ) : <Empty icon="📖" message="Kitob topilmadi" />}
+        ) : <Empty icon="рџ“–" message="Kitob topilmadi" />}
       </Card>
 
       {modal && (
@@ -120,14 +136,9 @@ export default function Books() {
             <FormGroup label="Muqova rangi" span={2}>
               <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', alignItems: 'center' }}>
                 {COLORS.map(c => (
-                  <button key={c} onClick={() => setForm(p => ({ ...p, coverColor: c }))} style={{
-                    width: 28, height: 28, borderRadius: 6, background: c, border: 'none', cursor: 'pointer',
-                    outline: form.coverColor === c ? '2px solid var(--text)' : 'none',
-                    outlineOffset: 2, transition: 'all 0.15s',
-                  }} />
+                  <button key={c} onClick={() => setForm(p => ({ ...p, coverColor: c }))} style={{ width: 28, height: 28, borderRadius: 6, background: c, border: 'none', cursor: 'pointer', outline: form.coverColor === c ? '2px solid var(--text)' : 'none', outlineOffset: 2, transition: 'all 0.15s' }} />
                 ))}
-                <input type="color" value={form.coverColor} onChange={e => setForm(p => ({ ...p, coverColor: e.target.value }))}
-                  style={{ width: 28, height: 28, padding: 0, border: '1px solid var(--border)', borderRadius: 6, cursor: 'pointer' }} />
+                <input type="color" value={form.coverColor} onChange={e => setForm(p => ({ ...p, coverColor: e.target.value }))} style={{ width: 28, height: 28, padding: 0, border: '1px solid var(--border)', borderRadius: 6, cursor: 'pointer' }} />
               </div>
             </FormGroup>
             <FormGroup label="Muqova rasmi" span={2}>
@@ -135,7 +146,9 @@ export default function Books() {
                 <input ref={fileRef} type="file" accept="image/*" style={{ display: 'none' }} onChange={handleImageUpload} />
                 {form.image
                   ? <img src={form.image} alt="" style={{ width: 50, height: 70, objectFit: 'cover', borderRadius: 6 }} />
-                  : <div style={{ width: 50, height: 70, borderRadius: 6, background: form.coverColor, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 20 }}>📖</div>
+                  : <div style={{ width: 50, height: 70, borderRadius: 6, background: form.coverColor, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                      <svg width="18" height="18" viewBox="0 0 24 24" fill="rgba(255,255,255,0.9)"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
+                    </div>
                 }
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
                   <Btn size="sm" onClick={() => fileRef.current.click()}>Rasm yuklash</Btn>
